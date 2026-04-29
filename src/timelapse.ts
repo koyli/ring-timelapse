@@ -68,7 +68,12 @@ async function timelapse() {
                 command.format("mp4");
 
                 // persist the file
-                command.save(path.resolve(__dirname, "target", f + "-" + Date.now() + '.mp4'));
+		if (keep) {
+                     command.save(path.resolve(__dirname, "target", f + "-" + "progress" + '.mp4'));
+                }
+                else {
+		     command.save(path.resolve(__dirname, "target", f + "-" + Date.now() + '.mp4'));
+		}
             }
         }
     });
