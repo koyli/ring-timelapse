@@ -7,6 +7,9 @@ import FfmpegCommand from 'fluent-ffmpeg';
 
 async function timelapse() {
 
+    const args = process.argv.slice(2);
+    const keep = (args[0] == "--keep")
+
     const folders = readdirSync(path.resolve(__dirname, "target"));
     folders.forEach(f => {
         if (lstatSync(path.resolve(__dirname, "target", f)).isDirectory()) {
@@ -28,12 +31,17 @@ async function timelapse() {
 
                 // Cleanup commands once timelapse is done
                 command.on('end', () => {
-                    console.log('Merging finished, removing snapshot images!');
-                    for (const file of files) {
-                        rmSync(path.resolve(__dirname, "target", f, file));
-                    }
-                    rmSync(templateFilePath);
-                    console.log("Done!");
+                    if (!keep) {
+		       console.log('Merging finished, removing snapshot images!');
+                       for (const file of files) {
+                       	    rmSync(path.resolve(__dirname, "target", f, file));
+                       }
+                       rmSync(templateFilePath);
+		       console.log("Done!");
+		     }
+                     else {
+		       console.log("keep argument provided - not deleting");
+		     }		     
                 });
 
                 // add all the image files

@@ -28,6 +28,7 @@ ENV TOKEN=$TOKEN
 # ENV CRON_SCHEDULE="*/1 * * * *"
 ENV CRON_SCHEDULE="*/15 * * * *"
 ENV CRON_SCHEDULE_TIMELAPSE="0 7 * * *"
+ENV CRON_SCHEDULE_PROGRESS="0 * * * *"
 
 WORKDIR /app
 
@@ -39,6 +40,7 @@ COPY --from=BUILD_IMAGE /work/package.json .
 # Setup the cron job to 
 RUN echo "$CRON_SCHEDULE cd /app && npm run snapshot" >> /etc/crontabs/root
 RUN echo "$CRON_SCHEDULE_TIMELAPSE cd /app && npm run timelapse" >> /etc/crontabs/root
+RUN echo "$CRON_SCHEDULE_PROGRESS cd /app && npm run timelapse --keep" >> /etc/crontabs/root
 
 # Create the cron log
 RUN touch /var/log/cron.log
