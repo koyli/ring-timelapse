@@ -36,12 +36,12 @@ async function timelapse() {
                        for (const file of files) {
                        	    rmSync(path.resolve(__dirname, "target", f, file));
                        }
-                       rmSync(templateFilePath);
-		       console.log("Done!");
 		     }
                      else {
 		       console.log("keep argument provided - not deleting");
 		     }		     
+		     rmSync(templateFilePath);
+		     console.log("Done!");
                 });
 
                 // add all the image files
