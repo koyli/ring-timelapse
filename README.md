@@ -54,7 +54,7 @@ docker run \
 
 The following variables are required:
 
-`TOKEN` - your generated Ring token, see Installation
+`TOKEN` - your generated Ring token, see Installation. Ring rotates this token every time it's used, so the container persists the current token to `.ring-token` inside the mounted volume and uses that on subsequent runs instead of the original `TOKEN` value.
 
 The following variables are optional:
 
