@@ -19,6 +19,20 @@ const readToken = (): string => {
     return process.env.TOKEN as string;
 };
 
+// Pings a healthchecks.io check so failures (or total silence, if the ping
+// never arrives) show up as alerts. See https://healthchecks.io/docs/
+const pingHealthcheck = async (suffix: "" | "/fail" = "", body?: string): Promise<void> => {
+    const url = process.env.HEALTHCHECKS_URL;
+    if (!url) {
+        return;
+    }
+    try {
+        await fetch(url + suffix, body ? { method: "POST", body } : undefined);
+    } catch (err) {
+        log(`Healthcheck ping failed: ${err}`);
+    }
+};
+
 const snapshot = async (): Promise<void> => {
     log("running snapshot")
 
@@ -40,6 +54,7 @@ const snapshot = async (): Promise<void> => {
     });
 
     const cameras = await ringApi.getCameras();
+    const failures: string[] = [];
 
     for (const camera of cameras) {
         // cameras.forEach(async camera => {
@@ -58,10 +73,17 @@ const snapshot = async (): Promise<void> => {
         }
         catch (err) {
             log(`Snapshot error: ${err}`);
+            failures.push(`${camera.name}: ${err}`);
         }
-    
+
 
     };
+
+    if (failures.length > 0) {
+        throw new Error(`Snapshot failed for ${failures.length} camera(s):\n${failures.join("\n")}`);
+    }
+
+    await pingHealthcheck();
 }
 
 dotenv.config();
@@ -70,6 +92,8 @@ snapshot() .then(() => {
     log("done");
     process.exit(0);
 })
-.catch(err => {
-    log(err)
+.catch(async err => {
+    log(err);
+    await pingHealthcheck("/fail", String(err));
+    process.exit(1);
 });

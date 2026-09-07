@@ -43,6 +43,7 @@ Start the container by running:
 docker run \
   -d \
   -e TOKEN="<insert token here>" \
+  -e HEALTHCHECKS_URL="<optional healthchecks.io ping URL>" \
   -v "/media/timelapse:/app/dist/target" \
   --restart unless-stopped \
   wictorwilen/ring-timelapse
@@ -61,6 +62,8 @@ The following variables are optional:
 `CRON_SCHEDULE` - Schedule for taking snapshots, in [Crontab format](https://linuxhandbook.com/crontab/). Default: `*/15 * * * *`
 
 `CRON_SCHEDULE_TIMELAPSE` - Schedule for generating the timelapse video. Default: `0 7 * * *`
+
+`HEALTHCHECKS_URL` - Ping URL for a [healthchecks.io](https://healthchecks.io) check. If set, the container pings this URL after every successful snapshot run, and pings `<HEALTHCHECKS_URL>/fail` (with the error details as the request body) if a snapshot run fails, whether that's a full failure or just one camera. Set the check's expected schedule to match `CRON_SCHEDULE` so healthchecks.io also alerts you if the container stops running entirely.
 
 ## Authors
 
