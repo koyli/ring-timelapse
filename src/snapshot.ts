@@ -79,8 +79,12 @@ const snapshot = async (): Promise<void> => {
 
     };
 
+    // Per-camera snapshot failures are common and often transient (e.g. the
+    // camera is mid-event-recording) - log them but don't alert on them.
+    // Only errors that stop the run outright (bad token, getCameras()
+    // failing, etc.) reach the top-level catch and page via healthchecks.
     if (failures.length > 0) {
-        throw new Error(`Snapshot failed for ${failures.length} camera(s):\n${failures.join("\n")}`);
+        log(`Snapshot failed for ${failures.length} camera(s):\n${failures.join("\n")}`);
     }
 
     await pingHealthcheck();
